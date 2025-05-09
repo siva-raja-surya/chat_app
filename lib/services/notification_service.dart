@@ -1,7 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
-      
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -19,16 +18,15 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'chat_messages',
-      'Chat Messages',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
+          'chat_messages',
+          'Chat Messages',
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: false,
+        );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
     );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notificationsPlugin.show(
-      0, title, body, platformChannelSpecifics,
-    );
+    await _notificationsPlugin.show(0, title, body, platformChannelSpecifics);
   }
 }

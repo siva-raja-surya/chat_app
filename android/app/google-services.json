@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "889432922997",
+    "project_id": "chat-app-flutter-surya",
+    "storage_bucket": "chat-app-flutter-surya.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:889432922997:android:39cffa9d38c2f24159513c",
+        "android_client_info": {
+          "package_name": "com.example.chat_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTsD3YVyuT24kS0pLdVDdK14odVnSbq0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

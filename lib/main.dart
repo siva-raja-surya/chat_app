@@ -6,8 +6,8 @@ import 'package:chat_app/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize notifications
+
+  // Initialize notificationsF
   await NotificationService.initialize();
 
   runApp(
@@ -25,14 +25,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Simple Chat',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const FriendsListScreen(),
     );
   }
 }
-
 
 // import 'package:flutter/material.dart';
 // import 'package:web_socket_channel/web_socket_channel.dart';

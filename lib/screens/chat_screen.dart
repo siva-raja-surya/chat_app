@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:chat_app/providers/chat_provider.dart';
 import 'package:chat_app/widgets/message_bubble.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   final String friendId;
   final String friendName;
   final String userId;
@@ -16,15 +16,39 @@ class ChatScreen extends StatelessWidget {
   });
 
   @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  late final TextEditingController _messageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _messageController = TextEditingController();
+    // Mark messages as read when opening the chat
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ChatProvider>(
+        context,
+        listen: false,
+      ).markMessagesAsRead(widget.friendId);
+    });
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final chatProvider = Provider.of<ChatProvider>(context);
-    final messages = chatProvider.getMessagesForUser(friendId);
+    final messages = chatProvider.getMessagesForUser(widget.friendId);
     final TextEditingController messageController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(friendName),
-      ),
+      appBar: AppBar(title: Text(widget.friendName)),
       body: Column(
         children: [
           Expanded(
@@ -35,7 +59,7 @@ class ChatScreen extends StatelessWidget {
                 final message = messages[messages.length - 1 - index];
                 return MessageBubble(
                   message: message,
-                  isMe: message.senderId == userId,
+                  isMe: message.senderId == widget.userId,
                 );
               },
             ),
@@ -58,8 +82,8 @@ class ChatScreen extends StatelessWidget {
                   onPressed: () {
                     if (messageController.text.isNotEmpty) {
                       chatProvider.sendMessage(
-                        senderId: userId,
-                        receiverId: friendId,
+                        senderId: widget.userId,
+                        receiverId: widget.friendId,
                         content: messageController.text,
                       );
                       messageController.clear();

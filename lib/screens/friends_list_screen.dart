@@ -18,8 +18,10 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
   void initState() {
     super.initState();
     // Connect to WebSocket when app starts
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ChatProvider>(context, listen: false).connect(userId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+      await chatProvider.loadMessagesFromDatabase();
+      chatProvider.connect(userId);
     });
   }
 
@@ -36,9 +38,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Friends'),
-      ),
+      appBar: AppBar(title: const Text('My Friends')),
       body: ListView.builder(
         itemCount: friends.length,
         itemBuilder: (context, index) {
@@ -47,27 +47,32 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
 
           return ListTile(
             title: Text(friend['name']!),
-            trailing: unread > 0
-                ? CircleAvatar(
-                    radius: 12,
-                    backgroundColor: Colors.red,
-                    child: Text(
-                      unread.toString(),
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  )
-                : null,
+            trailing:
+                unread > 0
+                    ? CircleAvatar(
+                      radius: 12,
+                      backgroundColor: Colors.red,
+                      child: Text(
+                        unread.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    )
+                    : null,
             onTap: () {
               // Mark messages as read when opening chat
               chatProvider.markMessagesAsRead(friend['id']!);
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ChatScreen(
-                    friendId: friend['id']!,
-                    friendName: friend['name']!,
-                    userId: userId,
-                  ),
+                  builder:
+                      (context) => ChatScreen(
+                        friendId: friend['id']!,
+                        friendName: friend['name']!,
+                        userId: userId,
+                      ),
                 ),
               );
             },
