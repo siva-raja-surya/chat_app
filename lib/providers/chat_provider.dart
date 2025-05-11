@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:chat_app/services/database_service.dart';
+import 'package:chat_app/services/fcm_service.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:chat_app/models/message_model.dart';
@@ -14,11 +15,19 @@ class ChatProvider with ChangeNotifier {
   bool get isConnected => _isConnected;
 
   void connect(String userId) async {
+    await _loadLocalMessages();
     _channel = WebSocketChannel.connect(Uri.parse('ws://10.0.2.2:3000'));
-
-    // Register user
-    _channel.sink.add(jsonEncode({'type': 'register', 'userId': userId}));
-
+    final fcmToken = await FCMService.getToken();
+    _channel.sink.add(
+      jsonEncode({'type': 'register', 'userId': userId, 'fcmToken': fcmToken}),
+    );
+    _channel.sink.add(
+      jsonEncode({
+        'type': 'sync_request',
+        'userId': userId,
+        'lastReceived': _getLastMessageTimestamp(),
+      }),
+    );
     _channel.stream.listen(
       (message) {
         final data = jsonDecode(message);
@@ -48,6 +57,16 @@ class ChatProvider with ChangeNotifier {
   Future<void> loadMessagesFromDatabase() async {
     _allMessages = await DatabaseService.instance.getAllMessages();
     notifyListeners();
+  }
+
+  Future<void> _loadLocalMessages() async {
+    _allMessages = await DatabaseService.instance.getAllMessages();
+    notifyListeners();
+  }
+
+  String? _getLastMessageTimestamp() {
+    if (_allMessages.isEmpty) return null;
+    return _allMessages.last.timestamp;
   }
 
   void _handleIncomingMessage(Map<String, dynamic> data) async {
